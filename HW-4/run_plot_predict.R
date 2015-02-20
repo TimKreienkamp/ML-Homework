@@ -20,20 +20,20 @@ library("snow")
 source("par_knn.R")
 
 #read in training data
-train <- read.csv("training.csv")
-X <- train[1:100,2:257]
-Y <- train[1:100,1]
+train <- read.csv("training.csv", header = F)
+X <- train[,2:257]
+Y <- train[,1]
 
 
 #set k List
-k_list <- c(1,2)
+k_list <- c(1,2,3,5,7,15,19,25,30,40,50)
 
 
 #compute results for different methods
-results_loo <- knnCVpar(X=X, y=Y,k_list = k_list, method = "loo", noCores = 3)
-results_kf <- knnCVpar(X=X, y=Y,k_list = k_list, method = "kf", noCores = 3, nfold = 10)
-results_mc <- knnCVpar(X=X, y=Y,k_list = k_list, method = "mc", noCores = 3, holdout = .10)
-results_res <- knnCVpar(X=X, y=Y,k_list = k_list, method = "res", noCores = 3, holdout = .10)
+results_loo <- knnCVpar(X=X, y=Y,k_list = k_list, method = "loo", noCores = 16)
+results_kf <- knnCVpar(X=X, y=Y,k_list = k_list, method = "kf", noCores = 16, nfold = 10)
+results_mc <- knnCVpar(X=X, y=Y,k_list = k_list, method = "mc", noCores = 16, holdout = .10, reps = 20)
+results_res <- knnCVpar(X=X, y=Y,k_list = k_list, method = "res", noCores = 16, holdout = .10)
 results_res <-  as.data.frame(results_res)
 results_mc <-  as.data.frame(results_mc)
 results_kf <-  as.data.frame(results_kf)
@@ -63,35 +63,35 @@ names(mean_results_mc) <- c("Method", "k", "Error")
 AllResults <- rbind(mean_results_res, mean_results_loo, mean_results_kf, mean_results_mc)
 
 #plot
-plot <- ggplot(data = AllResults, aes(x = k, y= Error, colour = Method)) + geom_line() + scale_x_discrete()
+plot <- ggplot(data = AllResults, aes(x = k, y= Error, colour = Method)) + geom_line() + ggtitle("Validation Methods Comparison")
 plot
 
 #read in test data
-test <- read.csv("test.csv")[1:10,]
+test <- read.csv("test.csv", header = F)
 
 #make predictions, one file for each "best k" chosen by each method
 
 #kfold blocks
 kf_best_k <- mean_results_kf$k[which.min(mean_results_kf$Error)]
-preds_kf <- as.data.frame(knn(train=X, test=test[1:10,], cl=Y, k=kf_best_k))
+preds_kf <- as.data.frame(knn(train=X, test=test, cl=Y, k=kf_best_k))
 names(preds_kf) <- c("Predicted Label")
 write.csv(preds_kf, "predictions_k_fold_blocks.csv", row.names = F)
 
 #kfold montecarlo
 mc_best_k <- mean_results_mc$k[which.min(mean_results_mc$Error)]
-preds_mc <- as.data.frame(knn(train=X, test=test[1:10,], cl=Y, k=mc_best_k))
+preds_mc <- as.data.frame(knn(train=X, test=test, cl=Y, k=mc_best_k))
 names(preds_mc) <- c("Predicted Label")
 write.csv(preds_kf, "predictions_k_fold_montecarlo.csv", row.names = F)
 
 #loo 
 loo_best_k <- mean_results_loo$k[which.min(mean_results_loo$Error)]
-preds_loo <- as.data.frame(knn(train=X, test=test[1:10,], cl=Y, k=loo_best_k))
+preds_loo <- as.data.frame(knn(train=X, test=test, cl=Y, k=loo_best_k))
 names(preds_loo) <- c("Predicted Label")
 write.csv(preds_loo, "predictions_loo.csv", row.names = F)
 
 #resubsitution
 res_best_k <- mean_results_res$k[which.min(mean_results_res$Error)]
-preds_res <- as.data.frame(knn(train=X, test=test[1:10,], cl=Y, k=res_best_k))
+preds_res <- as.data.frame(knn(train=X, test=test, cl=Y, k=res_best_k))
 names(preds_res) <- c("Predicted Label")
 write.csv(preds_loo, "predictions_resubstitution.csv", row.names = F)
 
