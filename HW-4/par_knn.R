@@ -53,7 +53,7 @@ results<- foreach(trial = trials, k = kList,
                         
                         # kNN results
                         testPredictions <- knn(train=Xtrain, test=Xtest, cl=Ytrain, k=k)
-                        testError <- mean(testPredictions != Ytest)
+                        Error <- mean(testPredictions != Ytest)
                         
                         # last thing is returned
                         result <- c(trial, k, Error)
@@ -94,7 +94,7 @@ results<- foreach(trial = trials, k = kList,
                         
                         # kNN results
                         testPredictions <- knn(train=Xtrain, test=Xtest, cl=Ytrain$Y, k=k)
-                        testError <- mean(testPredictions != Ytest$Y)
+                        Error <- mean(testPredictions != Ytest$Y)
                         
                         # last thing is returned
                         result <- c(bucket, k, Error)
