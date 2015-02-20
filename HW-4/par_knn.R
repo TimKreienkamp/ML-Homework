@@ -56,7 +56,7 @@ results<- foreach(trial = trials, k = kList,
                         testError <- mean(testPredictions != Ytest)
                         
                         # last thing is returned
-                        result <- c(trial, k, testError)
+                        result <- c(trial, k, Error)
                       }
     stopCluster(cl)
   }
@@ -97,7 +97,7 @@ results<- foreach(trial = trials, k = kList,
                         testError <- mean(testPredictions != Ytest$Y)
                         
                         # last thing is returned
-                        result <- c(bucket, k, testError)
+                        result <- c(bucket, k, Error)
                       }
     stopCluster(cl)
   }
