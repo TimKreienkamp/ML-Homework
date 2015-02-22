@@ -22,7 +22,7 @@ apply_binom = np.vectorize(apply_binom)
   
 
 def sim_data(intervals, ndraws, bias):
-     x = numpy.random.uniform(0,1,ndraws)
+     x = np.random.uniform(0,1,ndraws)
      pos_biased = create_pos_biased(x)
      eta_x = np.where(pos_biased, 0.5+bias, 0.5-bias)
      y = apply_binom(eta_x)
@@ -30,4 +30,3 @@ def sim_data(intervals, ndraws, bias):
      
 y, x = sim_data(intervals, 10**5, 0.)
     
-print(y)
