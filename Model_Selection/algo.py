@@ -68,5 +68,11 @@ def _sim_data(intervals, ndraws, bias):
 
 
 
-intervals = np.array([[0.1,0.5],[0.9,1.0]])
-x, y = _sim_data(intervals, 1000, 0)
+def predict(pred_intervals, x_val):
+    is_in_int = np.vectorize(lambda x:
+         np.any(np.apply_along_axis(lambda int: int[0] <= x <= int[1], 1, pred_intervals)))
+    y_pred = float(is_in_int(x_val))
+    return y_pred
+
+def test_error(y_true, y_pred):
+    return (1-np.mean(y_true == y_pred))
