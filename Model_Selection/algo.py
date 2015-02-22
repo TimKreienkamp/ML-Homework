@@ -62,8 +62,8 @@ def _sim_data(intervals, ndraws, bias):
      print(is_in_int(x))
      y = np.where(
          is_in_int(x), 
-         np.random.binomial(1, 0.5 + bias), 
-         np.random.binomial(1, 0.5 - bias)
+         np.random.binomial(1, 0.5 + bias, ndraws), 
+         np.random.binomial(1, 0.5 - bias, ndraws)
          )
      return (np.sort(x), y[np.argsort(x)])
 
