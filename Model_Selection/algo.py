@@ -3,7 +3,7 @@ from copy import copy
 import numpy as np
 
 
-def selection(y, nint):
+def selection(y, nint, save_all = False):
 
     classifiers = []
     g = _init(y)
@@ -17,11 +17,11 @@ def selection(y, nint):
             g[1]["adv"] -= g[0]["adv"]
             g.popleft()
     
-    classifiers.append(copy(g))
+    (save_all and classifiers.append(copy(g)))
 
-    all((_dp(g), classifiers.append(copy(g))) for i in range((len(g) - nint) / 2))
+    all((_dp(g), save_all and classifiers.append(copy(g))) for i in range((len(g) - nint) / 2))
 
-    return(classifiers)
+    return(save_all and classifiers or [g])
 
 
 def _init(y):
@@ -55,7 +55,7 @@ def _dp(g):
 
 
 def _sim_data(intervals, ndraws, bias):
-     x = np.random.uniform(0,1,ndraws)
+     x = np.random.uniform(0, 1, ndraws)
      is_in_int = np.vectorize(lambda x:
          np.any(np.apply_along_axis(lambda int: int[0] <= x <= int[1], 1, intervals)))
      y = np.where(
