@@ -5,7 +5,7 @@ import numpy as np
 
 def selection(y, nint):
 
-    classifiers = deque()
+    classifiers = []
     g = _init(y)
 
     if len(g) % 2 != nint % 2:
@@ -56,10 +56,8 @@ def _dp(g):
 
 def _sim_data(intervals, ndraws, bias):
      x = np.random.uniform(0,1,ndraws)
-     print(x)
      is_in_int = np.vectorize(lambda x:
          np.any(np.apply_along_axis(lambda int: int[0] <= x <= int[1], 1, intervals)))
-     print(is_in_int(x))
      y = np.where(
          is_in_int(x), 
          np.random.binomial(1, 0.5 + bias, ndraws), 
@@ -71,4 +69,4 @@ def _sim_data(intervals, ndraws, bias):
 
 
 intervals = np.array([[0.1,0.5],[0.9,1.0]])
-x, y = _sim_data(intervals, 10, 0)
+x, y = _sim_data(intervals, 1000, 0)
