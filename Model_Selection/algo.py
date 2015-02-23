@@ -3,7 +3,7 @@ from copy import copy
 import numpy as np
 
 
-def selection(y, nint, save_all = False):
+def selection(y, nint, save_all = True):
 
     classifiers = []
     g = _init(y)
@@ -67,7 +67,6 @@ def _sim_data(intervals, ndraws, bias):
 
 
 
-
 def predict(pred_intervals, x_val):
     is_in_int = np.vectorize(lambda x:
          np.any(np.apply_along_axis(lambda int: int[0] <= x <= int[1], 1, pred_intervals)))
@@ -76,3 +75,11 @@ def predict(pred_intervals, x_val):
 
 def test_error(y_true, y_pred):
     return (1-np.mean(y_true == y_pred))
+
+intervals = np.array([[0.1,0.5],[0.9,1.0]])
+x,y = _sim_data(intervals, 9, 0.3)
+
+classifiers = selection(y, 4)
+
+
+
