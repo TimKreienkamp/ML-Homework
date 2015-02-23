@@ -1,8 +1,16 @@
-
-library(rPython)
 interval_selection <- function(bias, n){
-  python.assign("bias", bias)
-  python.assign("ndraws", n)
+  
+  if (!require("ggplot2")) install.packages("ggplot2")
+  if (!require("rPython")) install.packages("rPython")
+  library(gplot2)
+  library(rPython)
+  
+  
+  ##########################################
+  #python function definitions
+  ###########################################
+  
+  
   python.exec('import numpy as np')
   python.exec("def _sim_data(intervals, ndraws, bias):
   x = np.random.uniform(0, 1, ndraws)
@@ -14,12 +22,7 @@ interval_selection <- function(bias, n){
     np.random.binomial(1, 0.5 - bias, ndraws)
     )
   return(np.sort(x), y[np.argsort(x)])")
-  python.exec("intervals = np.array([[0.1,0.5],[0.9,1.0]])")
-  python.exec("x,y = _sim_data(intervals, ndraws,bias)")
-  python.exec("y = y.tolist()")
-  python.exec("x = x.tolist()")
-  y = python.get("y")
-  x = python.get("x")
+
   
   python.exec('def selection(y, nint, save_all = True):
   
@@ -75,10 +78,28 @@ interval_selection <- function(bias, n){
           np.any(np.apply_along_axis(lambda int: int[0] <= x <= int[1], 1, pred_intervals)))
       y_pred = float(is_in_int(x_val))
       return y_pred')
-  ######################
+ 
+  ####################################
+  #python function execution
+  #####################################
+  
+  
+  python.exec("intervals = np.array([[0.1,0.5],[0.9,1.0]])")
+  python.exec("x,y = _sim_data(intervals, ndraws,bias)")
+  python.exec("y = y.tolist()")
+  python.exec("x = x.tolist()")
+  y = python.get("y")
+  x = python.get("x")
+  
+  python.assign("bias", bias)
+  python.assign("ndraws", n)
+  
+  
+  ######################################
+  #collection everything back into R
+  ######################################
   out_list = list(x=x,y=y)
-  
-  
+    
 }
 
 
