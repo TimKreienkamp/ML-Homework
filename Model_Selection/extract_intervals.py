@@ -38,19 +38,24 @@ def predict(pred_intervals, x_val):
     y_pred = y_pred.astype(np.float32, copy=False)
     return y_pred
 
+def test_error(y_true, y_pred):
+    return (1-np.mean(y_true == y_pred))
 
 def _get_all_errors(all_intervals, x_val, x_train, y_val,ytrain):
-    error = []
+    validation_error = []
+    training_error = []
     complexity = []
     for interval in all_intervals:
         y_pred = predict(interval, x_val)
-        train_preds = predict(interval, y_train)
+        train_preds = predict(interval, x_train)
+        train_error = test_error(y_train, train_preds)
         val_error = test_error(y_val, y_pred)
-        error.append(val_error)
-        if interval[(interval.shape[1]-1],1] = 1.0:
+        validation_error.append(val_error)
+        training_error.append(train_error)
+        if interval[(interval.shape[1]-1,1] = 1.0:
             complexity.append((intervals.shape[1])*2)
         else:
             complexity.append((intervals.shape[1])*2+1)
-    retur
+    return validation error, training_error, complexity
     
     
