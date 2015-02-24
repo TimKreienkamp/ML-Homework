@@ -53,9 +53,9 @@ def _get_all_errors(all_intervals, x_val, x_train, y_val,y_train):
         validation_error.append(val_error)
         training_error.append(train_error)
         if interval[(interval.shape[0])-1,1] == 1.0:
-            complexity.append((intervals.shape[0])*2)
+            complexity.append((interval.shape[0])*2)
         else:
-            complexity.append((intervals.shape[1])*2+1)
+            complexity.append((interval.shape[0])*2+1)
     return validation_error, training_error, complexity
 
     
