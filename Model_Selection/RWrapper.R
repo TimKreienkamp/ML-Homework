@@ -2,7 +2,7 @@ interval_selection <- function(bias, n){
   
   if (!require("ggplot2")) install.packages("ggplot2")
   if (!require("rPython")) install.packages("rPython")
-  library(gplot2)
+  library(ggplot2)
   library(rPython)
   
   
@@ -12,6 +12,8 @@ interval_selection <- function(bias, n){
   
   
   python.exec('import numpy as np')
+  python.exec('from collections import deque')
+  python.exec('from copy import copy')
   python.exec("def _sim_data(intervals, ndraws, bias):
   x = np.random.uniform(0, 1, ndraws)
   is_in_int = np.vectorize(lambda x:
@@ -83,6 +85,8 @@ interval_selection <- function(bias, n){
   #python function execution
   #####################################
   
+  python.assign("bias", bias)
+  python.assign("ndraws", n)
   
   python.exec("intervals = np.array([[0.1,0.5],[0.9,1.0]])")
   python.exec("x,y = _sim_data(intervals, ndraws,bias)")
@@ -91,15 +95,17 @@ interval_selection <- function(bias, n){
   y = python.get("y")
   x = python.get("x")
   
-  python.assign("bias", bias)
-  python.assign("ndraws", n)
+
   
   
   ######################################
   #collection everything back into R
   ######################################
   out_list = list(x=x,y=y)
-    
+  python.exec("classifiers = selection(y,4)")
+  python.exec("classifiers = classifiers")
+  out_list = list(x=x,y=y)
+  return(out_list)
 }
-
+interval_selection(0.2,10)
 
