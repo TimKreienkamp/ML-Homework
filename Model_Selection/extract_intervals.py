@@ -39,9 +39,9 @@ def predict(pred_intervals, x_val):
     return y_pred
 
 def test_error(y_true, y_pred):
-    return (1-np.mean(y_true == y_pred))
+    return np.mean(y_true != y_pred)
 
-def _get_all_errors(all_intervals, x_val, x_train, y_val,ytrain):
+def _get_all_errors(all_intervals, x_val, x_train, y_val,y_train):
     validation_error = []
     training_error = []
     complexity = []
@@ -52,10 +52,11 @@ def _get_all_errors(all_intervals, x_val, x_train, y_val,ytrain):
         val_error = test_error(y_val, y_pred)
         validation_error.append(val_error)
         training_error.append(train_error)
-        if interval[(interval.shape[1]-1,1] = 1.0:
-            complexity.append((intervals.shape[1])*2)
+        if interval[(interval.shape[0])-1,1] == 1.0:
+            complexity.append((intervals.shape[0])*2)
         else:
             complexity.append((intervals.shape[1])*2+1)
-    return validation error, training_error, complexity
+    return validation_error, training_error, complexity
+
     
     
