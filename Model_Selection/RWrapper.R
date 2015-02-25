@@ -1,4 +1,4 @@
-setwd("/Users/timkreienkamp/documents/studium/data_science/machine_learning/problem_sets/ML-Homework/model_selection/")
+#setwd("/Users/timkreienkamp/documents/studium/data_science/machine_learning/problem_sets/ML-Homework/model_selection/")
 
 interval_selection <- function(bias = 0.2, n_train = 1000, n_val=500, n_intervals = 100, shortest_k = 3){
   
@@ -51,13 +51,11 @@ interval_selection <- function(bias = 0.2, n_train = 1000, n_val=500, n_interval
   return(list(results=results, plot=plot))
 }
 
-ggplot(data = results$results, aes(x = complexity, y= Error, colour = error_type, group = error_type)) +  geom_line()
 
 results <- interval_selection(n_train = 10000, shortest_k = 70)
 plot1 <- results$plot + ggtitle ("Validation /Training Error vs Complexity (Bias = 0.2)")
 results_2 <- interval_selection(n_train = 10000, shortest_k = 70, bias = 0.4)
 
-plot2 <- results_2$plot + ggtitle ("Validation /Training Error vs Complexity (Bias = 0.4)")
 
 
 
