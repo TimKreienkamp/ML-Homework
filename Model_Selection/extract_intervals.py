@@ -14,8 +14,8 @@ def _get_all_intervals(classifiers,x):
         cutoff_list_end = []
         j = 0
         while j < len(classifiers[i])-1:
-            cutoff_list_end.append(x[classifiers[i][j]["cutoff"]])
-            cutoff_list_start.append(x[classifiers[i][j]["cutoff"]+1])
+            cutoff_list_end.append(x[classifiers[i][j]["bound"]])
+            cutoff_list_start.append(x[(classifiers[i][j]["bound"])+1])
             label_list.append(classifiers[i][j]["label"])
             j += 1
         label_list.append(classifiers[i][j]["label"])
@@ -41,11 +41,13 @@ def predict(pred_intervals, x_val):
 def test_error(y_true, y_pred):
     return np.mean(y_true != y_pred)
 
-def _get_all_errors(all_intervals, x_val, x_train, y_val,y_train, classifiers, shortest_k):
+def _get_all_errors(all_intervals, x_val, x_train, y_val,y_train, classifiers, shortest_k = 0):
         validation_error = []
         training_error = []
         complexity = []
         all_intervals.reverse()
+        if shortest_k == 0:
+            shortest_k = len(all_intervals)
         for i in range(0, shortest_k, 1):
             print i
             y_pred = predict(all_intervals[i], x_val)
@@ -63,7 +65,14 @@ def _get_true_intervals(partition_size):
     endpoints = np.arange(partition_size, 1.0, (2.0*partition_size))
     true_intervals =np.column_stack((startpoints, endpoints))
     return true_intervals
-    
 
-    
-    
+def _zip_lists(classifiers_odd, classifiers_even):
+    if len(classifiers_odd) == len(classifiers_even):
+        classifiers = [j for i in zip(classifiers_even,classifiers_odd) for j in i]
+    elif (len(classifiers_odd) > len(classifiers_even)):
+        classifiers = classifiers_odd.pop(0)
+        classifiers.append([j for i in zip(classifiers_even,classifiers_odd) for j in i])
+    else:
+        classifiers = classifiers_even.pop(0)
+        classifiers.append([j for i in zip(classifiers_even,classifiers_odd) for j in i])
+    return classifiers
