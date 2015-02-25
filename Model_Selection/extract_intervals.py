@@ -41,22 +41,22 @@ def predict(pred_intervals, x_val):
 def test_error(y_true, y_pred):
     return np.mean(y_true != y_pred)
 
-def _get_all_errors(all_intervals, x_val, x_train, y_val,y_train):
-    validation_error = []
-    training_error = []
-    complexity = []
-    for interval in all_intervals:
-        y_pred = predict(interval, x_val)
-        train_preds = predict(interval, x_train)
-        train_error = test_error(y_train, train_preds)
-        val_error = test_error(y_val, y_pred)
-        validation_error.append(val_error)
-        training_error.append(train_error)
-        if interval[(interval.shape[0])-1,1] == 1.0:
-            complexity.append((interval.shape[0])*2)
-        else:
-            complexity.append((interval.shape[0])*2+1)
-    return validation_error, training_error, complexity
+def _get_all_errors(all_intervals, x_val, x_train, y_val,y_train, classifiers, shortest_k):
+        validation_error = []
+        training_error = []
+        complexity = []
+        all_intervals.reverse()
+        for i in range(0, shortest_k, 1):
+            print i
+            y_pred = predict(all_intervals[i], x_val)
+            train_preds = predict(all_intervals[i], x_train)
+            train_error = test_error(y_train, train_preds)
+            val_error = test_error(y_val, y_pred)
+            validation_error.append(val_error)
+            training_error.append(train_error)
+            complexity.append(len(classifiers[(len(classifiers)-i-1)]))
+        all_intervals.reverse()
+        return validation_error, training_error, complexity
 
 def _get_true_intervals(partition_size):
     startpoints = np.arange(0,(1.0-partition_size), (2.0*partition_size))
