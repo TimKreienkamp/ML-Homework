@@ -1,3 +1,7 @@
+"""
+Implements hybrid heap/linked list data structure that enables log-lin time dynamic programming.
+"""
+
 from collections import deque
 from copy import deepcopy
 import numpy as np
@@ -5,11 +9,15 @@ import heapq
 
 
 class Section(list):
-
+    """
+    Linked list node representing a section of the partition. Hijacks the standard list to enable ordering by the heapq module.
+    """
 
     def __init__(self, adv, bound, label, prev, next):
         
+        # this sets the hidden counter used by the heap
         self.append(adv)
+
         self.act = True
         self.adv = adv
         self.bound = bound
@@ -18,13 +26,15 @@ class Section(list):
         self.next = next
 
     
-    def __repr__(self):
+    def __str__(self):
 
         return repr({"adv": self.adv, "bound": self.bound, "label": self.label})
 
 
 class Partition(object):
-
+    """
+    Combines linked list and heap to allow for efficient extraction of the best classifier for some n.
+    """
 
     def __init__(self, labels):
 
@@ -38,14 +48,18 @@ class Partition(object):
             if y[i] == self.heap[-1].label:
                 self.heap[-1].bound += 1
                 self.heap[-1].adv += 1
-                self.heap[-1][0] += 1
+                # this refreshs the hidden counter used by the heap
+                self.heap[-1][0] += 1 
             else:
                 self._append(Section(1, i, y[i], None, None))
 
-        self._heapify()
+        self.start.act = self.end.act = False
+        # we drop the edge elements as we are not interested in poppin them
+        self.heap = self.heap[1:-1]
+        heapq.heapify(self.heap)
 
 
-    def __repr__(self):
+    def __str__(self):
 
         return str(self.flatten())
 
@@ -54,21 +68,22 @@ class Partition(object):
         
         ninit = len(self.flatten())
         if ninit % 2 != nint % 2: self._remove_one()
-        if save: self.classifiers.append(deepcopy(self.flatten()))
+        if save: self.classifiers.append(self.flatten())
         if verb: print(self.flatten())
         
         for i in range((ninit - nint) // 2):
             self._remove_two()
             if verb: print(self.flatten())
-            if save: self.classifiers.append(deepcopy(self.flatten()))
+            if save: self.classifiers.append(self.flatten())
         
-        return(save and self.classifiers or deepcopy(self.flatten()))
+        return(save and self.classifiers or self.flatten())
 
 
     def flatten(self):
         
         sections = []
         cursor = self.start
+
         while cursor != None:
             sections.append({"adv": cursor.adv, "bound": cursor.bound, "label": cursor.label})
             cursor = cursor.next
@@ -78,7 +93,6 @@ class Partition(object):
 
     def _append(self, section):
         
-        # set links
         if len(self.heap) == 0:
             self.start = section
         else:
@@ -87,46 +101,30 @@ class Partition(object):
         section.prev = self.end
         self.end = section
 
-        # add to list
         self.heap.append(section)
-
-
-    def _heapify(self):
         
-        # initialize heap. reinitialize after appending!
-        self.start.act = self.end.act = False
-        self.heap = self.heap[1:-1]
-        heapq.heapify(self.heap)
-
     
     def _remove_one(self):
-        
-        # l-pop or r-pop, depending on advantage
+    
         if self.start.adv > self.end.adv: self._rpop()
         else: self._lpop()
         
 
     def _remove_two(self):
 
-        # get smallest active sections from heap
         smallest = None
         while smallest is None:
             section = heapq.heappop(self.heap)
             smallest = (section.act and section or None)
 
-        # check for outer pop
         if smallest.adv > self.start.adv + self.end.adv:
             heapq.heappush(self.heap, smallest)
             self._lpop()
             self._rpop()
             
-        # else, do inner pop
         else:
-            
-            # remove obsolete sections from heap
             smallest.act = smallest.prev.act = smallest.next.act = False
 
-            # insert replacement section into the list
             replacement = Section(
                 smallest.prev.adv + smallest.next.adv - smallest.adv,
                 smallest.next.bound,
@@ -135,7 +133,6 @@ class Partition(object):
                 smallest.next.next
             )
 
-            # check if replacement is at the edge. if not, push to heap
             if replacement.prev is None and replacement.next is None:
                 self.start = self.end = replacement
                 replacement.act = False
@@ -158,10 +155,8 @@ class Partition(object):
     
     def _lpop(self):
         
-        # remove obsolete section from heap
         self.start.next.act = False
 
-        # l-append new section to list
         self.start = Section(
             self.start.next.adv - self.start.adv,
             self.start.next.bound,
@@ -170,17 +165,14 @@ class Partition(object):
             self.start.next.next
         )
 
-        # reset links
         self.start.act = False
         self.start.next.prev = self.start
 
 
     def _rpop(self):
         
-        # remove obsolete section from heap
         self.end.prev.act = False
 
-        # r-append new section to list
         self.end = Section(
             self.end.prev.adv - self.end.adv,
             self.end.bound,
@@ -189,6 +181,5 @@ class Partition(object):
             None
         )
 
-        # reset links
         self.end.act = False
         self.end.prev.next = self.end
