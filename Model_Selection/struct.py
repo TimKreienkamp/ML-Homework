@@ -160,7 +160,7 @@ class Partition(object):
         self.start = Section(
             self.start.next.adv - self.start.adv,
             self.start.next.bound,
-            self.start.label,
+            self.start.next.label,
             None,
             self.start.next.next
         )
