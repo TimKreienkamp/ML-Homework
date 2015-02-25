@@ -58,5 +58,12 @@ def _get_all_errors(all_intervals, x_val, x_train, y_val,y_train):
             complexity.append((interval.shape[0])*2+1)
     return validation_error, training_error, complexity
 
+def _get_true_intervals(partition_size):
+    startpoints = np.arange(0,(1.0-partition_size), (2.0*partition_size))
+    endpoints = np.arange(partition_size, 1.0, (2.0*partition_size))
+    true_intervals =np.column_stack((startpoints, endpoints))
+    return true_intervals
+    
+
     
     
