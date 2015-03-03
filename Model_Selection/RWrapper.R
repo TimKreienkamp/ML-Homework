@@ -1,4 +1,4 @@
-setwd("/Users/timkreienkamp/documents/studium/data_science/machine_learning/problem_sets/ML-Homework/model_selection/")
+#setwd("/Users/timkreienkamp/documents/studium/data_science/machine_learning/problem_sets/ML-Homework/model_selection/")
 
 interval_selection <- function(bias = 0.2, n_train = 1000, n_val=500, n_intervals = 100, shortest_k = 3){
   
