@@ -45,7 +45,8 @@ perceptron <- function(type = "train", X, y = NULL, max_epochs = 5, w = NULL, b 
         activation <- activation[1]
         if ((y[j]*activation) <= 0){
           w <- w + (y[j]*as.numeric(X[j,]))
-          b <- b + y
+          b <- b + y[j]
+          
         }
       }
       #compute the training predictions and the training error
@@ -62,6 +63,6 @@ perceptron <- function(type = "train", X, y = NULL, max_epochs = 5, w = NULL, b 
     error = NULL
   }
   
-  return(list(error = error, preds = preds))
+  return(list(error = error, preds = preds, w= w, b = b))
   
 }
