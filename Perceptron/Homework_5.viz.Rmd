@@ -1,0 +1,192 @@
+---
+title: "ML Homework 5"
+author: "Tim Kreienkamp"
+date: "5. März 2015"
+output: html_document
+---
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r, echo = F, warning =F, message=F}
+setwd("/users/timkreienkamp/documents/studium/data_science/machine_learning/problem_sets/ML-Homework/Perceptron")
+
+library(ggplot2)
+source("Perceptron_Clean_2.R")
+source("generate_cats_dogs_data.R")
+
+########seperable case#######
+#generate lineraly seperable data first
+noCats <- 50; noDogs <- 50; muCats <- c(4, 170); muDogs <- c(10, 80); 
+sdCats <- c(1,20); sdDogs <- c(2,30);
+rhoCats= -0.1; rhoDogs = 0.8; 
+
+animalsDf <- catsAndDogs(noCats, noDogs, muCats, muDogs, sdCats, 
+                          sdDogs, rhoCats, rhoDogs, seed=1111)
+                         
+        
+
+animalsDf$Label <- ifelse(animalsDf$Animal == "Cats", 1, -1)
+y <- animalsDf$Label
+X <- animalsDf[,1:2]
+
+results <- perceptron(X=X, y=y, trace = T)
+
+# compute the seperating hyperplane
+b <- results$b
+w <- results$w
+xx <- sort(X[,1])
+a <- -w[1]/w[2]
+hyperplane <- (a*xx)-(b/w[1])
+
+
+boundaryDf <- data.frame(cbind(xx,hyperplane))
+boundaryDf$Animal <- rep("Boundary", 100)
+names(boundaryDf) <- c("weight", "height", "Animal")
+
+
+seperable <- ggplot(data = animalsDf, aes(x = height, y = weight, 
+                             colour=Animal, fill=Animal)) + 
+  geom_point() +
+  xlab("Height") +
+  ylab("Weight") +
+  theme_bw(base_size = 14, base_family = "Helvetica") + 
+  geom_line(data=boundaryDf) + 
+  scale_color_manual("Animal", 
+                     values = c("Boundary" = "grey", "Cats" = "blue", "Dogs" = "red"))
+
+convergence_1 <- ggplot(data = results$trace_frame, aes (x= Iter, y=Error)) + geom_line()
+
+
+
+
+noCats <- 50; noDogs <- 50; muCats <- c(4, 150); muDogs <- c(30, 80); 
+sdCats <- c(1,20); sdDogs <- c(7,30);
+rhoCats= -0.1; rhoDogs = 0.8; 
+
+animalsDf <- catsAndDogs(noCats, noDogs, muCats, muDogs, sdCats, 
+                         sdDogs, rhoCats, rhoDogs, seed=1111)
+
+
+
+animalsDf$Label <- ifelse(animalsDf$Animal == "Cats", 1, -1)
+y <- animalsDf$Label
+X <- animalsDf[,1:2]
+
+results <- perceptron(X=X, y=y, trace = T)
+
+xx <- sort(X[,1])
+b <- results$b
+w <- results$w
+
+a <- -w[1]/w[2]
+
+hyperplane <- (a*xx)-(b/w[1])
+
+boundaryDf <- data.frame(cbind(xx,hyperplane))
+boundaryDf$Animal <- rep("Boundary", 100)
+names(boundaryDf) <- c("weight", "height", "Animal")
+
+
+
+# illustrating the data
+seperable_higher_radius <- ggplot(data = animalsDf, aes(x = height, y = weight, 
+                                          colour=Animal, fill=Animal)) + 
+  geom_point() +
+  xlab("Height") +
+  ylab("Weight") +
+  theme_bw(base_size = 14, base_family = "Helvetica") + 
+  geom_line(data=boundaryDf) + 
+  scale_color_manual("Animal", 
+                     values = c("Boundary" = "grey", "Cats" = "blue", "Dogs" = "red"))
+convergence_2 <- ggplot(data = results$trace_frame, aes (x= Iter, y=Error)) + geom_line()
+
+####non seperable case####
+
+
+noCats <- 50; noDogs <- 50; muCats <- c(10, 150); muDogs <- c(8, 130); 
+sdCats <- c(1,20); sdDogs <- c(2,30);
+rhoCats= -0.1; rhoDogs = 0.8; 
+
+
+
+animalsDf <- catsAndDogs(noCats, noDogs, muCats, muDogs, sdCats, 
+                         sdDogs, rhoCats, rhoDogs, seed=1111)
+
+
+
+animalsDf$Label <- ifelse(animalsDf$Animal == "Cats", 1, -1)
+y <- animalsDf$Label
+X <- animalsDf[,1:2]
+
+results <- perceptron(X=X, y=y, trace = T, max_epochs = 20)
+
+xx <- sort(X[,1])
+b <- results$b
+w <- results$w
+
+a <- -w[1]/w[2]
+
+hyperplane <- (a*xx)-(b/w[1])
+
+boundaryDf <- data.frame(cbind(xx,hyperplane))
+boundaryDf$Animal <- rep("Boundary", 100)
+names(boundaryDf) <- c("weight", "height", "Animal")
+
+
+
+# illustrating the data
+non_seperable <- ggplot(data = animalsDf, aes(x = height, y = weight, 
+                                                        colour=Animal, fill=Animal)) + 
+  geom_point() +
+  xlab("Height") +
+  ylab("Weight") +
+  theme_bw(base_size = 14, base_family = "Helvetica") + 
+  geom_line(data=boundaryDf) + 
+  scale_color_manual("Animal", 
+                     values = c("Boundary" = "grey", "Cats" = "blue", "Dogs" = "red"))
+
+convergence_3 <- ggplot(data = results$trace_frame, aes (x= Iter, y=Error)) + geom_line()
+
+```
+
+First, I generate some points (Dogs and Cats), which are linearly seperable and let the perceptron find the seperating hyperplane, which in 2D is just a line.
+
+```{r, echo = F}
+seperable
+```
+
+Let's take a look at the convergence:
+
+
+```{r, echo = F}
+convergence_1
+```
+
+After oscillating a little bit, The perceptron converges after roughly 140 iterations. We can clearly see that it is not a steepest descent based method.
+Let's increase the radius of the points a little bit:
+
+
+```{r, echo = F}
+seperable_higher_radius
+```
+
+
+```{r, echo = F}
+convergence_2
+```
+
+With the classes more stretched out the perceptron can actually find the hyper plane much faster. 
+Now let's see what non-seperable classes give us:
+
+```{r, echo = F}
+non_seperable
+```
+
+
+here the hyperplane found is essentially useless. Looking at the error, shows us that the perceptron iterates and iterates and improves, and worsens until the maximum number of iterations are reached. It is not able to even find a local minimum, which makes it in it's unkernelized version pretty much useless in the real world. 
+```{r, echo = F}
+convergence_3
+```
+
