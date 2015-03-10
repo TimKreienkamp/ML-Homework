@@ -18,6 +18,10 @@ adaPredict <- function(X, tree_list, alpha_vec){
 
 adaTrain <- function(formula, input, depth = 1, iter =5 ){
   
+  if(!require(rpart)) install.packages("rpart")
+  library(rpart)
+  
+  
   error_vec <- rep(0, iter)
   ###rpart can only cope with formulas which force me to do some messy hacking here
   
